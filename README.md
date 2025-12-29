@@ -43,6 +43,23 @@ Example:
 !gcloud projects list
 ```
 
+### `get_secret_via_gcloud`
+
+Fetches a secret value from **Google Cloud Secret Manager** by invoking the `gcloud` CLI.
+
+The function:
+1. Sets the active Google Cloud project.
+2. Retrieves the specified secret version.
+3. Returns the secret payload as a string.
+
+**Parameters**
+- `project_id` (`str`): Google Cloud project ID.
+- `secret_name` (`str`): Name of the secret.
+- `version` (`str`, optional): Secret version to access (default: `"latest"`).
+
+**Returns**
+- `str`: The decoded secret value.
+
 ---
 
 ## Notes
