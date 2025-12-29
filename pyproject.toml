@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "colab-gcp-auth"
+version = "0.1.0"
+description = "Authenticate Google Cloud (gcloud) in Google Colab using Colab Secrets."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+  { name = "Your Name" }
+]
+keywords = ["google-colab", "gcp", "gcloud", "authentication", "service-account"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/yourname/colab-gcp-auth"
+Repository = "https://github.com/yourname/colab-gcp-auth"
+Issues = "https://github.com/yourname/colab-gcp-auth/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
