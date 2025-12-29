@@ -54,3 +54,31 @@ def gcp_connect(secret_name: str = "personal_gcp_key") -> None:
                 os.remove(key_path)
             except OSError:
                 pass
+
+
+def get_secret_via_gcloud(project_id: str, secret_name: str, version: str = "latest") -> str:
+    # Set project
+    subprocess.run(
+        ["gcloud", "config", "set", "project", project_id],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    # Access secret
+    result = subprocess.run(
+        [
+            "gcloud",
+            "secrets",
+            "versions",
+            "access",
+            version,
+            f"--secret={secret_name}",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    return result.stdout.strip()
+
