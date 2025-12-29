@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [
-  { name = "Your Name" }
+  { name = "Vadim Vanak" }
 ]
 keywords = ["google-colab", "gcp", "gcloud", "authentication", "service-account"]
 classifiers = [
@@ -22,9 +22,9 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/yourname/colab-gcp-auth"
-Repository = "https://github.com/yourname/colab-gcp-auth"
-Issues = "https://github.com/yourname/colab-gcp-auth/issues"
+Homepage = "https://github.com/VadimVanak/colab-gcp-auth"
+Repository = "https://github.com/VadimVanak/colab-gcp-auth"
+Issues = "https://github.com/VadimVanak/colab-gcp-auth/issues"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
