@@ -54,7 +54,7 @@ The function:
 
 **Parameters**
 - `project_id` (`str`): Google Cloud project ID.
-- `secret_name` (`str`): Name of the secret.
+- `secret_id` (`str`): Name of the secret.
 - `version` (`str`, optional): Secret version to access (default: `"latest"`).
 
 **Returns**
