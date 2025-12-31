@@ -4,7 +4,7 @@ import sys
 import shlex
 import subprocess
 import tempfile
-from typing import Optional
+from typing import Iterable, Optional, List
 
 
 def gcp_connect(
@@ -70,7 +70,7 @@ def gcp_connect(
     return key_path
 
 
-def get_secret_via_gcloud(
+def gcp_get_secret(
     project_id: str,
     secret_id: str,
     version_id: str = "latest",
@@ -113,3 +113,89 @@ def get_argv(PARAMS: str = ""):
 
     return sys.argv
 
+
+def gcp_transfer(
+    src: str,
+    dst: str,
+    mode: str = "rsync",
+    *,
+    delete: bool = False,
+    checksum: bool = False,
+    preserve_posix: bool = False,
+    dry_run: bool = False,
+    extra_args: Optional[Iterable[str]] = None,
+) -> None:
+    """
+    Wrapper around `gsutil` for copying / syncing between local paths and GCS.
+
+    Parameters
+    ----------
+    src, dst:
+        Source and destination paths. Either can be a local path or a GCS URL (gs://...).
+        For folder transfers, pass a folder path (local dir or gs://bucket/prefix).
+    mode:
+        "rsync" (default) or "cp".
+    delete:
+        If True and mode="rsync", pass `-d` to delete extra files at destination.
+    checksum:
+        If True and mode="rsync", pass `-c` to compare checksums instead of mtime/size.
+    preserve_posix:
+        If True and mode="cp", pass `-p` (preserve POSIX attributes where supported).
+    dry_run:
+        If True, print the gsutil command instead of running it.
+    extra_args:
+        Extra args appended to the gsutil command (advanced use).
+
+    Notes
+    -----
+    - Uses `gsutil -m` for parallelism (multi-thread/process) automatically.
+    - If a local directory is detected (os.path.isdir), copies/syncs recursively.
+    - `gsutil rsync` is directory-oriented. If mode="rsync" but src is a local file,
+      this function falls back to `cp`.
+    """
+    mode = (mode or "rsync").strip().lower()
+    if mode not in {"rsync", "cp"}:
+        raise ValueError(f"mode must be 'rsync' or 'cp', got: {mode}")
+
+    def is_gcs(p: str) -> bool:
+        return p.startswith("gs://")
+
+    def local_is_dir(p: str) -> bool:
+        return (not is_gcs(p)) and os.path.isdir(p)
+
+    def local_is_file(p: str) -> bool:
+        return (not is_gcs(p)) and os.path.isfile(p)
+
+    args: List[str] = ["gsutil", "-m"]
+
+    # Decide whether this is a directory transfer (best-effort)
+    dir_like = local_is_dir(src) or local_is_dir(dst)
+    # If src is a local file, rsync doesn't make sense -> cp fallback
+    if mode == "rsync" and local_is_file(src):
+        mode = "cp"
+
+    if mode == "rsync":
+        # rsync is for directories/prefixes; -r to include subfolders
+        args += ["rsync", "-r"]
+        if delete:
+            args.append("-d")
+        if checksum:
+            args.append("-c")
+        args += [src, dst]
+    else:
+        # cp supports files and directories
+        args += ["cp"]
+        if preserve_posix:
+            args.append("-p")
+        if dir_like:
+            args.append("-r")  # recursive copy of folder + subfolders
+        args += [src, dst]
+
+    if extra_args:
+        args.extend(list(extra_args))
+
+    if dry_run:
+        print(" ".join(args))
+        return
+
+    subprocess.run(args, check=True)
