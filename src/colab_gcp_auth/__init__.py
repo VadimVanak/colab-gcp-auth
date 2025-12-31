@@ -1,3 +1,3 @@
-from .auth import gcp_connect, get_secret_via_gcloud, get_argv
+from .auth import gcp_connect, gcp_get_secret, get_argv, gcp_transfer
 
-__all__ = ["gcp_connect", "get_secret_via_gcloud", "get_argv"]
+__all__ = ["gcp_connect", "gcp_get_secret", "get_argv", "gcp_transfer"]
