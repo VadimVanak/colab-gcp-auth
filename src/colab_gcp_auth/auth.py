@@ -1,5 +1,7 @@
 import json
 import os
+import sys
+import shlex
 import subprocess
 import tempfile
 from typing import Optional
@@ -84,3 +86,30 @@ def get_secret_via_gcloud(
     name = f"projects/{project_id}/secrets/{secret_id}/versions/{version_id}"
     response = client.access_secret_version(request={"name": name})
     return response.payload.data.decode("utf-8")
+
+
+def get_argv(PARAMS: str = ""):
+    """
+    Return an argv list suitable for argparse.
+
+    - In Google Colab:
+        * If PARAMS is a non-empty CLI-like string, it is parsed and used
+        * The program name is taken from sys.argv[0] if available, otherwise 'notebook'
+    - Outside Colab (including nbconvert → .py execution):
+        * Returns sys.argv unchanged
+    """
+    # Detect Colab without external helpers
+    in_colab = "google.colab" in sys.modules
+
+    # Determine a stable program name for help / usage messages
+    prog = (
+        os.path.basename(sys.argv[0])
+        if sys.argv and sys.argv[0]
+        else "notebook"
+    )
+
+    if in_colab and PARAMS.strip():
+        return [prog] + shlex.split(PARAMS)
+
+    return sys.argv
+
